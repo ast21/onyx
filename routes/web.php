@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::view('/', 'chat');
+
+Route::post('/chat', function (\Illuminate\Http\Request $request) {
+    return response()->json(['reply' => $request->input('message')]);
 });
