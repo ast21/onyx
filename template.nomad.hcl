@@ -2,7 +2,8 @@ job "onyx" {
   datacenters = ["de1"]
 
   meta {
-    deploy_timestamp = "2024-06-14T18:59:00"
+    image_tag        = "${IMAGE_TAG}"
+    deploy_timestamp = "${DEPLOY_TIMESTAMP}"
   }
 
   group "svc" {
@@ -43,7 +44,7 @@ job "onyx" {
       driver = "docker"
 
       config {
-        image = "ghcr.io/ast21/onyx:main"
+        image = "ghcr.io/ast21/onyx:${IMAGE_TAG}"
         auth {
           username = "ast21"
           password = "${GITHUB_TOKEN}"
