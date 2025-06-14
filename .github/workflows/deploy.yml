@@ -32,8 +32,9 @@ jobs:
           TAG=$(cat ./tmp/short_sha.txt)
           echo "image_tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Setup Nomad CLI
-        uses: hashicorp/setup-nomad@v1
+      - name: Setup Nomad
+        uses: hashicorp/setup-nomad@main
+        id: setup
         with:
           version: ${{ env.NOMAD_VERSION }}
 
