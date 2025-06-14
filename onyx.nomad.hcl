@@ -1,6 +1,10 @@
 job "onyx" {
   datacenters = ["de1"]
 
+  meta {
+    deploy_timestamp = "2024-06-14T18:59:00"
+  }
+
   group "svc" {
     count = 1
 
