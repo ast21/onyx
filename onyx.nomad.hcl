@@ -1,5 +1,5 @@
 job "onyx" {
-  datacenters = ["dc1"]
+  datacenters = ["de1"]
 
   group "svc" {
     count = 1
