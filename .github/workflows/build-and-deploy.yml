@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build And Deploy
 
 on:
   push:
@@ -36,9 +36,7 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.image_tag }}
             ghcr.io/${{ github.repository }}:latest
 
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
+      # Deploy
       - name: Setup Nomad
         uses: hashicorp/setup-nomad@main
         id: setup
