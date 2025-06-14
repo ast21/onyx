@@ -1,0 +1,55 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches: [main]
+
+env:
+  NOMAD_VERSION: 1.9.7
+  NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
+  NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set image tag
+        id: vars
+        run: echo "image_tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.image_tag }}
+            ghcr.io/${{ github.repository }}:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Nomad
+        uses: hashicorp/setup-nomad@main
+        id: setup
+        with:
+          version: ${{ env.NOMAD_VERSION }}
+
+      - name: Generate Nomad file from template
+        run: |
+          export IMAGE_TAG=${{ steps.vars.outputs.image_tag }}
+          export DEPLOY_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          envsubst < template.nomad.hcl > job.nomad.hcl
+
+      - name: Run Nomad job
+        run: nomad run job.nomad.hcl
