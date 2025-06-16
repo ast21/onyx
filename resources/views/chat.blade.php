@@ -32,7 +32,8 @@
 
     <form @submit.prevent="sendMessage" class="flex gap-2">
         <input type="text" x-model="message" x-ref="input"
-               class="input input-bordered w-full" placeholder="Введите сообщение...">
+               class="input input-bordered focus:outline-none focus:ring-0 focus:border-base-content w-full"
+               placeholder="Введите сообщение...">
         <button type="submit" class="btn btn-primary">
             Отправить
         </button>
