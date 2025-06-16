@@ -43,8 +43,12 @@
                     </svg>
                 </button>
 
-                <details class="dropdown dropdown-end">
-                    <summary class="btn btn-ghost btn-circle avatar">
+                <details class="dropdown dropdown-end" 
+                         x-data="{ open: false }" 
+                         @click.outside="open = false"
+                         :open="open">
+                    <summary class="btn btn-ghost btn-circle avatar"
+                             @click.prevent="open = !open">
                         <div class="w-10 rounded-full">
                             <img src="{{ auth()->user()->avatar }}" alt="Profile" />
                         </div>
