@@ -37,16 +37,24 @@
 </div>
 
 <div x-data="chatApp()" x-init="$nextTick(() => $refs.input.focus())"
-     class="w-full max-w-md bg-base-100 shadow-xl rounded-box p-6 space-y-4 transition-all duration-500">
+     class="w-full md:w-1/2 h-full md:h-auto bg-base-100 shadow-xl rounded-box p-6 space-y-4 transition-all duration-500">
 
     <h1 class="text-2xl font-bold text-primary">Простой Чат</h1>
 
-    <div class="h-64 overflow-y-auto border rounded-box p-2 space-y-2 bg-base-300 transition-all duration-500" x-ref="chatBox">
+    <div class="h-[60vh] md:h-64 overflow-y-auto border rounded-box p-2 space-y-2 bg-base-300 transition-all duration-500" x-ref="chatBox">
         <template x-for="msg in messages" :key="msg.id">
             <div class="chat"
                  :class="msg.sender === 'me' ? 'chat-end' : 'chat-start'">
                 <div class="chat-bubble" :class="msg.sender === 'me' ? 'chat-bubble-primary' : 'chat-bubble-accent'"
                      x-text="msg.text">
+                </div>
+            </div>
+        </template>
+
+        <template x-if="loading">
+            <div class="chat chat-start">
+                <div class="chat-bubble chat-bubble-accent animate-pulse">
+                    печатает...
                 </div>
             </div>
         </template>
