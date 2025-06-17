@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" 
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
       x-data="{ theme: localStorage.getItem('theme') || 'light' }"
-      x-init="$watch('theme', val => { 
+      x-init="$watch('theme', val => {
           localStorage.setItem('theme', val);
           document.documentElement.setAttribute('data-theme', val);
       })"
@@ -13,12 +13,12 @@
     <title>{{ config('app.name') }} - Чат</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-base-100 antialiased">
+<body class="bg-base-100 antialiased flex flex-col">
 
 {{-- Navbar Container --}}
-<div class="w-full bg-base-100 border-b sticky top-0 z-50">
-    <div class="flex justify-center w-full">
-        <nav class="navbar w-full max-w-[800px] px-4" role="navigation">
+<div class="w-full bg-base-100 sticky top-0 z-50 h-16 flex-none">
+    <div class="flex justify-center w-full h-full">
+        <nav class="navbar w-full max-w-[800px] px-4 border-b" role="navigation">
             <div class="navbar-start">
                 <h1 class="text-lg font-medium">{{ config('app.name') }}</h1>
             </div>
@@ -43,8 +43,8 @@
                     </svg>
                 </button>
 
-                <details class="dropdown dropdown-end" 
-                         x-data="{ open: false }" 
+                <details class="dropdown dropdown-end"
+                         x-data="{ open: false }"
                          @click.outside="open = false"
                          :open="open">
                     <summary class="btn btn-ghost btn-circle avatar"
@@ -73,17 +73,17 @@
 </div>
 
 {{-- Chat Container --}}
-<main class="flex justify-center w-full">
-    <div x-data="chatApp()" 
+<main class="flex justify-center w-full flex-auto">
+    <div x-data="chatApp()"
          x-init="$nextTick(() => $refs.input.focus())"
-         class="flex flex-col h-[calc(100vh-4rem)] w-full max-w-[800px] px-4">
-        
+         class="flex flex-col h-full w-full max-w-[800px] px-4">
+
         {{-- Messages Container --}}
         <section x-ref="chatBox"
                  class="flex-1 p-4 space-y-2 scroll-smooth"
                  :class="{ 'overflow-y-auto': messages.length > 0 }"
                  aria-live="polite">
-            
+
             {{-- Empty State --}}
             <template x-if="messages.length === 0">
                 <div class="h-full flex items-center justify-center text-base-content/50">
@@ -93,12 +93,12 @@
 
             {{-- Message List --}}
             <template x-for="msg in messages" :key="msg.id">
-                <article class="flex" 
+                <article class="flex"
                          :class="msg.sender === 'me' ? 'justify-end' : 'justify-start'"
                          :aria-label="msg.sender === 'me' ? 'Ваше сообщение' : 'Сообщение бота'">
-                    <div class="max-w-[80%] break-words" 
+                    <div class="max-w-[80%] break-words"
                          :class="msg.sender === 'me' ? 'text-right' : 'text-left'">
-                        <p class="inline-block px-4 py-2 rounded-lg" 
+                        <p class="inline-block px-4 py-2 rounded-lg"
                            :class="msg.sender === 'me' ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'"
                            x-text="msg.text">
                         </p>
@@ -118,24 +118,24 @@
 
         {{-- Input Form --}}
         <footer class="border-t border-base-200 bg-base-100 p-4">
-            <form @submit.prevent="sendMessage" 
-                  class="flex gap-2" 
+            <form @submit.prevent="sendMessage"
+                  class="flex gap-2"
                   aria-label="Форма отправки сообщения">
-                <input type="text" 
-                       x-model="message" 
+                <input type="text"
+                       x-model="message"
                        x-ref="input"
                        x-on:blur="focusInput()"
                        class="input input-bordered flex-1 focus:outline-none focus:border-primary bg-base-100"
                        placeholder="Введите сообщение..."
                        :disabled="loading"
                        aria-label="Текст сообщения">
-                <button type="submit" 
+                <button type="submit"
                         class="btn btn-primary btn-square"
                         :disabled="loading || !message.trim()"
                         aria-label="Отправить сообщение">
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                         class="h-5 w-5" 
-                         viewBox="0 0 20 20" 
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-5 w-5"
+                         viewBox="0 0 20 20"
                          fill="currentColor"
                          aria-hidden="true">
                         <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
