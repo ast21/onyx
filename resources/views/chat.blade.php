@@ -18,7 +18,7 @@
 {{-- Navbar Container --}}
 <div class="w-full bg-base-100 sticky top-0 z-50 h-16 flex-none">
     <div class="flex justify-center w-full h-full">
-        <nav class="navbar w-full max-w-[800px] px-4 border-b" role="navigation">
+        <nav class="navbar w-full max-w-[800px] px-4 border-b border-base-content/20" role="navigation">
             <div class="navbar-start">
                 <h1 class="text-lg font-medium">{{ config('app.name') }}</h1>
             </div>
