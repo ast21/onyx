@@ -125,7 +125,7 @@
                        x-model="message"
                        x-ref="input"
                        x-on:blur="focusInput()"
-                       class="input input-bordered flex-1 focus:outline-none focus:border-primary bg-base-100"
+                       class="input input-bordered text-base flex-1 focus:outline-none focus:border-primary bg-base-100"
                        placeholder="Введите сообщение..."
                        :disabled="loading"
                        aria-label="Текст сообщения">
