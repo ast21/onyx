@@ -32,4 +32,6 @@ rr
 !/storage/framework/testing/.gitignore
 !/storage/framework/views/.gitignore
 
-Dockerfile
+.deployment
+!.deployment/php.ini-production
+!.deployment/php.ini-development

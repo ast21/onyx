@@ -24,7 +24,7 @@ FROM breakhack/php-cli:8.2
 WORKDIR /app
 COPY --from=vendor_installer /app/vendor/ /app/vendor/
 COPY --from=asset_builder /app/public/build /app/public/build
-COPY php.ini-production /usr/local/etc/php/php.ini
+COPY .deployment/php.ini-production /usr/local/etc/php/php.ini
 COPY --chown=1000:1000 . .
 RUN php artisan storage:link
 
