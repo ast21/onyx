@@ -75,7 +75,6 @@
 {{-- Chat Container --}}
 <main class="flex justify-center w-full flex-auto">
     <div x-data="chatApp()"
-         x-init="$nextTick(() => $refs.input.focus())"
          class="flex flex-col h-full w-full max-w-[800px] px-4">
 
         {{-- Messages Container --}}
@@ -124,11 +123,10 @@
                 <input type="text"
                        x-model="message"
                        x-ref="input"
-                       x-on:blur="focusInput()"
                        class="input input-bordered text-base flex-1 focus:outline-none focus:border-primary bg-base-100"
                        placeholder="Введите сообщение..."
                        :disabled="loading"
-                       aria-label="Текст сообщения">
+                       aria-label="Текст сообщения" autofocus>
                 <button type="submit"
                         class="btn btn-primary btn-square"
                         :disabled="loading || !message.trim()"

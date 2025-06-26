@@ -17,7 +17,7 @@ Route::middleware('auth')->group(function () {
 
     Route::view('/chat', 'chat')->name('chat');
     Route::post('/chat', function (\Illuminate\Http\Request $request) {
-        sleep(1);
+        usleep(500 * 1000);
         return response()->json(['reply' => $request->input('message')]);
     });
 

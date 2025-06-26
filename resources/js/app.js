@@ -1,7 +1,7 @@
 import './bootstrap';
 
 // Constants
-const LOADING_DELAY = 800;
+const LOADING_DELAY = 0;
 const MESSAGE_TYPES = {
     USER: 'me',
     BOT: 'bot'
@@ -20,8 +20,7 @@ Alpine.data('chatApp', () => ({
     // Lifecycle hooks
     init() {
         // Initial focus
-        this.$nextTick(() => this.focusInput());
-        
+
         // Watch for messages changes
         this.$watch('messages', () => {
             this.$nextTick(() => this.scrollToLatestMessage());
