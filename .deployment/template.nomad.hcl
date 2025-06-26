@@ -1,86 +1,89 @@
+# Using envsubst inside github actions
+locals {
+    domain    = "${DOMAIN}"
+    image     = "${IMAGE}"
+    image_tag = "${IMAGE_TAG}"
+}
+
 job "onyx" {
-  datacenters = ["de1"]
+    datacenters = ["de1"]
 
-  meta {
-    image_tag        = "${IMAGE_TAG}"
-    deploy_timestamp = "${DEPLOY_TIMESTAMP}"
-  }
-
-  group "svc" {
-    count = 1
-
-    network {
-      mode = "bridge"
-
-      port "http" {
-        to = 8000
-      }
+    meta {
+        image_tag = "${local.image_tag}"
     }
 
-    service {
-      tags = [
-        "traefik.enable=true",
-        "traefik.http.routers.onyx.rule=Host(`onyx.l80.ru`)",
-        "traefik.http.routers.onyx.tls=true",
-        "traefik.http.routers.onyx.tls.certresolver=leRes",
-      ]
+    group "svc" {
+        count = 1
 
-      port = "http"
+        network {
+            mode = "bridge"
 
-      check {
-        type     = "tcp"
-        interval = "10s"
-        port     = "http"
-        path     = "/up"
-        timeout  = "5s"
-      }
-    }
-
-    task "server" {
-      vault {
-        policies = ["access-secrets"]
-      }
-
-      driver = "docker"
-
-      config {
-        image = "ghcr.io/ast21/onyx:${IMAGE_TAG}"
-        auth {
-          username = "ast21"
-          password = "${GITHUB_TOKEN}"
+            port "http" {
+                to = 8000
+            }
         }
 
-        ports = ["http"]
+        service {
+            tags = [
+                "traefik.enable=true",
+                "traefik.http.routers.${NOMAD_JOB_NAME}.rule=Host(`${local.domain}`)",
+                "traefik.http.routers.${NOMAD_JOB_NAME}.tls=true",
+                "traefik.http.routers.${NOMAD_JOB_NAME}.tls.certresolver=leRes",
+            ]
 
-        volumes = [
-          ".env:/var/www/html/.env"
-        ]
-      }
+            port = "http"
 
-      template {
-        data = <<EOF
+            check {
+                type     = "tcp"
+                interval = "10s"
+                port     = "http"
+                path     = "/up"
+                timeout  = "5s"
+            }
+        }
+
+        task "app" {
+            vault {
+                policies = ["access-secrets"]
+            }
+
+            driver = "docker"
+
+            config {
+                image = "${local.image}:${local.image_tag}"
+                auth {
+                    username = "${GITHUB_USER}"
+                    password = "${GITHUB_TOKEN}"
+                }
+
+                ports = ["http"]
+            }
+
+            template {
+                data        = <<EOF
+GITHUB_USER="{{ with secret "secret/data/auth" }}{{ .Data.data.GITHUB_USER }}{{ end }}"
 GITHUB_TOKEN="{{ with secret "secret/data/auth" }}{{ .Data.data.GITHUB_TOKEN }}{{ end }}"
 EOF
-        destination = "secrets/env"
-        env         = true
-      }
+                destination = "secrets/env"
+                env         = true
+            }
 
-      template {
-        data        = <<EOF
+            template {
+                data        = <<EOF
 {{ with secret "secret/data/onyx" }}
 {{ range $k, $v := .Data.data }}
 {{ $k }}={{ $v }}
 {{ end }}
 {{ end }}
 EOF
-        destination = "local/env"
-        env         = true
-      }
+                destination = "local/env"
+                env         = true
+            }
 
-      resources {
-        cpu    = 200
-        memory = 200
-      }
+            resources {
+                cpu    = 200
+                memory = 200
+            }
+        }
     }
-  }
 }
