@@ -13,6 +13,7 @@ const scrollToBottom = (element) => element.scrollTop = element.scrollHeight;
 
 // Chat application state and logic
 Alpine.data('chatApp', () => ({
+    mode: 'echo',
     message: '',
     messages: [],
     loading: false,
@@ -50,8 +51,13 @@ Alpine.data('chatApp', () => ({
     },
 
     async handleBotResponse(userMessage) {
+        const data = {
+            mode: this.mode,
+            message: userMessage
+        }
+
         try {
-            const response = await axios.post('/chat', { message: userMessage });
+            const response = await axios.post('/chat', data);
             await new Promise(resolve => setTimeout(resolve, LOADING_DELAY));
             return response.data.reply;
         } catch (error) {

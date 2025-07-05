@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -15,11 +16,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::redirect('/', 'chat');
 
-    Route::view('/chat', 'chat')->name('chat');
-    Route::post('/chat', function (\Illuminate\Http\Request $request) {
-        usleep(500 * 1000);
-        return response()->json(['reply' => $request->input('message')]);
-    });
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat');
+    Route::post('/chat', [ChatController::class, 'reply']);
 
     Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 });
