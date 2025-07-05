@@ -30,7 +30,7 @@ class GoogleController extends Controller
                 ]
             );
 
-            Auth::login($user);
+            Auth::login($user, remember: true);
 
             return redirect()->route('chat');
         } catch (Exception $e) {
