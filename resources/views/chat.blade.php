@@ -129,7 +129,7 @@
                     @click="mode = 'tasky'"
                     aria-label="Tasky"
                 >
-                    <x-heroicon-o-check-circle class="w-6 h-6" />
+                    <x-heroicon-o-check-badge class="w-6 h-6" />
                 </button>
             </div>
         </div>
