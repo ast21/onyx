@@ -14,10 +14,14 @@ Route::middleware('guest')->group(function () {
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
-    Route::redirect('/', 'chat');
+    Route::redirect('/', 'chats');
 
-    Route::get('/chat', [ChatController::class, 'index'])->name('chat');
-    Route::post('/chat', [ChatController::class, 'reply']);
+    Route::get('/chats', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chats', [ChatController::class, 'store'])->name('chat.store');
+    Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chats/{chat}/messages', [ChatController::class, 'messages'])->name('chat.messages');
+    Route::post('/chats/messages', [ChatController::class, 'storeChatAndMessage']);
+    Route::post('/chats/{chat}/messages', [ChatController::class, 'storeMessage'])->name('chat.messages.store');
 
     Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 });

@@ -21,12 +21,25 @@
         {{-- Sidebar --}}
         <aside class="fixed top-0 left-0 z-40 h-full transition-transform duration-300 ease-in-out"
                :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen, 'lg:translate-x-0': true}">
-            <div class="w-80 h-full bg-base-200 p-4">
-                <div class="flex flex-col gap-4">
-                    <button class="btn btn-primary w-full gap-2">
+            <div class="w-80 h-full bg-base-200 p-4 flex flex-col">
+                <form action="{{ route('chat.store') }}" method="POST" class="mb-4">
+                    @csrf
+                    <button type="submit" class="btn btn-primary w-full gap-2">
                         <x-heroicon-o-plus class="w-5 h-5" />
                         Новый чат
                     </button>
+                </form>
+
+                <div class="flex-1 overflow-y-auto">
+                    @foreach($chats ?? [] as $chatItem)
+                        <a href="{{ route('chat.show', $chatItem) }}"
+                           class="block p-3 mb-2 rounded-lg hover:bg-base-300 {{ isset($chat) && $chat->id === $chatItem->id ? 'bg-base-300' : '' }}">
+                            <div class="flex items-center gap-3">
+                                <x-heroicon-o-chat-bubble-left-right class="w-5 h-5" />
+                                <span class="text-sm truncate">{{ $chatItem->title ?: 'Новый чат' }}</span>
+                            </div>
+                        </a>
+                    @endforeach
                 </div>
             </div>
         </aside>
@@ -91,7 +104,8 @@
 
             {{-- Chat Content --}}
             <div class="flex justify-center w-full">
-                <div x-data="chatApp()" class="flex flex-col h-full w-full max-w-[800px] px-4">
+                <div x-data="chatApp({{ $chat?->id }})"
+                     class="flex flex-col h-full w-full max-w-[800px] px-4">
                     {{-- Messages Container --}}
                     <section x-ref="chatBox"
                              class="flex-1 p-4 space-y-2 scroll-smooth"
@@ -138,7 +152,7 @@
                                 type="button"
                                 class="btn btn-sm btn-ghost btn-square"
                                 :class="{ 'btn-active': mode === 'echo' }"
-                                @click="mode = 'echo'"
+                                @click="mode = 'echo'; focusInput()"
                                 aria-label="Echo"
                             >
                                 <x-heroicon-o-signal class="w-6 h-6" />
@@ -151,10 +165,23 @@
                                 type="button"
                                 class="btn btn-sm btn-ghost btn-square"
                                 :class="{ 'btn-active': mode === 'tasky' }"
-                                @click="mode = 'tasky'"
+                                @click="mode = 'tasky'; focusInput()"
                                 aria-label="Tasky"
                             >
                                 <x-heroicon-o-check-badge class="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        {{-- Error --}}
+                        <div class="tooltip" data-tip="Error">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-ghost btn-square"
+                                :class="{ 'btn-active': mode === 'error' }"
+                                @click="mode = 'error'; focusInput()"
+                                aria-label="Error"
+                            >
+                                <x-heroicon-o-no-symbol class="w-6 h-6" />
                             </button>
                         </div>
                     </div>
@@ -175,13 +202,7 @@
                                     class="btn btn-primary btn-square"
                                     :disabled="loading || !message.trim()"
                                     aria-label="Отправить сообщение">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     class="h-5 w-5"
-                                     viewBox="0 0 20 20"
-                                     fill="currentColor"
-                                     aria-hidden="true">
-                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                                </svg>
+                                <x-heroicon-o-arrow-up-circle class="w-6 h-6" />
                             </button>
                         </form>
                     </div>

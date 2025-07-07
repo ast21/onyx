@@ -1,36 +1,16 @@
 import './bootstrap';
 
-// Constants
-const LOADING_DELAY = 0;
-const MESSAGE_TYPES = {
-    USER: 'me',
-    BOT: 'bot'
-};
-
-// Helper functions
-const generateMessageId = () => Date.now();
-const scrollToBottom = (element) => element.scrollTop = element.scrollHeight;
-
-// Chat application state and logic
-Alpine.data('chatApp', () => ({
-    mode: 'echo',
-    message: '',
+Alpine.data('chatApp', (chatId = null) => ({
     messages: [],
+    message: '',
     loading: false,
+    mode: 'echo',
+    chatId: chatId,
 
-    // Lifecycle hooks
     init() {
-        // Initial focus
-
-        // Watch for messages changes
-        this.$watch('messages', () => {
-            this.$nextTick(() => this.scrollToLatestMessage());
-        });
-    },
-
-    // Methods
-    scrollToLatestMessage() {
-        scrollToBottom(this.$refs.chatBox);
+        if (this.chatId) {
+            this.loadMessages();
+        }
     },
 
     focusInput() {
@@ -42,46 +22,72 @@ Alpine.data('chatApp', () => ({
         }
     },
 
-    createMessage(text, sender) {
-        return {
-            id: generateMessageId(),
-            text,
-            sender
-        };
-    },
-
-    async handleBotResponse(userMessage) {
-        const data = {
-            mode: this.mode,
-            message: userMessage
-        }
-
+    async loadMessages() {
         try {
-            const response = await axios.post('/chat', data);
-            await new Promise(resolve => setTimeout(resolve, LOADING_DELAY));
-            return response.data.reply;
+            const { data } = await axios.get(`/chats/${this.chatId}/messages`);
+            this.messages = data.messages.map(msg => ({
+                id: msg.id,
+                text: msg.content,
+                sender: msg.sender === 'user' ? 'me' : 'assistant'
+            }));
+            this.scrollToBottom();
         } catch (error) {
-            console.error('Error getting bot response:', error);
-            return 'Ошибка при получении ответа';
+            console.error('Failed to load messages:', error);
         }
     },
 
     async sendMessage() {
-        const text = this.message.trim();
-        if (!text) return;
+        if (!this.message.trim() || this.loading) return;
 
-        // Add user message
-        this.messages.push(this.createMessage(text, MESSAGE_TYPES.USER));
+        const messageText = this.message;
         this.message = '';
         this.loading = true;
 
-        // Get and add bot response
-        const botReply = await this.handleBotResponse(text);
-        this.messages.push(this.createMessage(botReply, MESSAGE_TYPES.BOT));
+        try {
+            const { data } = await axios.post(
+                this.chatId ? `/chats/${this.chatId}/messages` : '/chats',
+                {
+                    message: messageText,
+                    mode: this.mode
+                }
+            );
 
-        // Reset state and ensure focus after a short delay
-        this.loading = false;
-        setTimeout(() => this.focusInput(), 100);
+            if (!this.chatId && data.chat_id) {
+                window.location.href = `/chats/${data.chat_id}`;
+                return;
+            }
+
+            // Add user message
+            this.messages.push({
+                id: data.user_message.id,
+                text: data.user_message.content,
+                sender: 'me'
+            });
+
+            this.scrollToBottom();
+
+            // Add assistant's response
+            this.messages.push({
+                id: data.assistant_message.id,
+                text: data.assistant_message.content,
+                sender: 'assistant'
+            });
+
+        } catch (error) {
+            console.error('Failed to send message:', error);
+            this.message = messageText;
+        } finally {
+            this.loading = false;
+            setTimeout(() => this.focusInput(), 100);
+            this.scrollToBottom();
+        }
+    },
+
+    scrollToBottom() {
+        this.$nextTick(() => {
+            const chatBox = this.$refs.chatBox;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
     }
 }));
 
