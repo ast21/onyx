@@ -85,8 +85,13 @@ Alpine.data('chatApp', (chatId = null) => ({
 
     scrollToBottom() {
         this.$nextTick(() => {
-            const chatBox = this.$refs.chatBox;
-            chatBox.scrollTop = chatBox.scrollHeight;
+            const messagesContainer = this.$refs.chatBox.parentElement;
+            if (messagesContainer) {
+                messagesContainer.scrollTo({
+                    top: messagesContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
         });
     }
 }));

@@ -105,106 +105,102 @@
             {{-- Chat Content --}}
             <div class="flex justify-center w-full">
                 <div x-data="chatApp({{ $chat?->id }})"
-                     class="flex flex-col h-full w-full max-w-[800px] px-4">
+                     class="flex flex-col h-[calc(100vh-4rem)] w-full max-w-[800px] px-4 relative">
+
                     {{-- Messages Container --}}
-                    <section x-ref="chatBox"
-                             class="flex-1 p-4 space-y-2 scroll-smooth"
-                             :class="{ 'overflow-y-auto': messages.length > 0 }"
-                             aria-live="polite">
-
-                        {{-- Empty State --}}
-                        <template x-if="messages.length === 0">
-                            <div class="h-full flex items-center justify-center text-base-content/50">
-                                <span class="text-sm">Начните общение...</span>
-                            </div>
-                        </template>
-
-                        {{-- Message List --}}
-                        <template x-for="msg in messages" :key="msg.id">
-                            <article class="flex"
-                                     :class="msg.sender === 'me' ? 'justify-end' : 'justify-start'"
-                                     :aria-label="msg.sender === 'me' ? 'Ваше сообщение' : 'Сообщение бота'">
-                                <div class="max-w-[80%] break-words"
-                                     :class="msg.sender === 'me' ? 'text-right' : 'text-left'">
-                                    <p class="inline-block px-4 py-2 rounded-lg"
-                                       :class="msg.sender === 'me' ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'"
-                                       x-text="msg.text">
-                                    </p>
+                    <div class="flex-1 overflow-y-auto mb-28">
+                        <section x-ref="chatBox"
+                                 class="flex-1 p-4 space-y-2 scroll-smooth"
+                                 aria-live="polite">
+                            {{-- Empty State --}}
+                            <template x-if="messages.length === 0">
+                                <div class="h-full flex items-center justify-center text-base-content/50">
+                                    <span class="text-sm">Начните общение...</span>
                                 </div>
-                            </article>
-                        </template>
+                            </template>
 
-                        {{-- Loading State --}}
-                        <template x-if="loading">
-                            <div class="flex justify-start">
-                                <div class="inline-block px-4 py-2 rounded-lg bg-base-200">
-                                    <span class="loading loading-dots loading-sm" aria-label="Загрузка..."></span>
+                            {{-- Message List --}}
+                            <template x-for="msg in messages" :key="msg.id">
+                                <article class="flex"
+                                         :class="msg.sender === 'me' ? 'justify-end' : 'justify-start'"
+                                         :aria-label="msg.sender === 'me' ? 'Ваше сообщение' : 'Сообщение бота'">
+                                    <div class="max-w-[80%] break-words"
+                                         :class="msg.sender === 'me' ? 'text-right' : 'text-left'">
+                                        <p class="inline-block px-4 py-2 rounded-lg"
+                                           :class="msg.sender === 'me' ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'"
+                                           x-text="msg.text">
+                                        </p>
+                                    </div>
+                                </article>
+                            </template>
+
+                            {{-- Loading State --}}
+                            <template x-if="loading">
+                                <div class="flex justify-start">
+                                    <div class="inline-block px-4 py-2 rounded-lg bg-base-200">
+                                        <span class="loading loading-dots loading-sm" aria-label="Загрузка..."></span>
+                                    </div>
                                 </div>
-                            </div>
-                        </template>
-                    </section>
-
-                    {{-- Suggestion Icon Buttons --}}
-                    <div class="pt-3 flex flex-wrap gap-2">
-                        {{-- Echo --}}
-                        <div class="tooltip" data-tip="Echo">
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-ghost btn-square"
-                                :class="{ 'btn-active': mode === 'echo' }"
-                                @click="mode = 'echo'; focusInput()"
-                                aria-label="Echo"
-                            >
-                                <x-heroicon-o-signal class="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        {{-- Tasky --}}
-                        <div class="tooltip" data-tip="Tasky">
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-ghost btn-square"
-                                :class="{ 'btn-active': mode === 'tasky' }"
-                                @click="mode = 'tasky'; focusInput()"
-                                aria-label="Tasky"
-                            >
-                                <x-heroicon-o-check-badge class="w-6 h-6" />
-                            </button>
-                        </div>
-
-                        {{-- Error --}}
-                        <div class="tooltip" data-tip="Error">
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-ghost btn-square"
-                                :class="{ 'btn-active': mode === 'error' }"
-                                @click="mode = 'error'; focusInput()"
-                                aria-label="Error"
-                            >
-                                <x-heroicon-o-no-symbol class="w-6 h-6" />
-                            </button>
-                        </div>
+                            </template>
+                        </section>
                     </div>
 
-                    {{-- Input Form --}}
-                    <div class="border-base-200 bg-base-100 py-4">
-                        <form @submit.prevent="sendMessage"
-                              class="flex gap-2"
-                              aria-label="Форма отправки сообщения">
-                            <input type="text"
-                                   x-model="message"
-                                   x-ref="input"
-                                   class="input input-bordered text-base flex-1 focus:outline-none focus:border-primary bg-base-100"
-                                   placeholder="Введите сообщение..."
-                                   :disabled="loading"
-                                   aria-label="Текст сообщения" autofocus>
-                            <button type="submit"
-                                    class="btn btn-primary btn-square"
-                                    :disabled="loading || !message.trim()"
-                                    aria-label="Отправить сообщение">
-                                <x-heroicon-o-arrow-up-circle class="w-6 h-6" />
-                            </button>
-                        </form>
+                    {{-- Input Area (Fixed at bottom) --}}
+                    <div class="absolute bottom-0 left-0 right-0 bg-base-100 border-t border-base-200 p-4">
+                        {{-- Mode Controls --}}
+                        <div class="flex justify-start gap-2">
+                            <div class="tooltip" data-tip="Echo">
+                                <button type="button"
+                                        class="btn btn-sm btn-ghost btn-square"
+                                        :class="{ 'btn-active': mode === 'echo' }"
+                                        @click="mode = 'echo'; focusInput()"
+                                        aria-label="Echo">
+                                    <x-heroicon-o-signal class="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div class="tooltip" data-tip="Tasky">
+                                <button type="button"
+                                        class="btn btn-sm btn-ghost btn-square"
+                                        :class="{ 'btn-active': mode === 'tasky' }"
+                                        @click="mode = 'tasky'; focusInput()"
+                                        aria-label="Tasky">
+                                    <x-heroicon-o-check-badge class="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div class="tooltip" data-tip="Error">
+                                <button type="button"
+                                        class="btn btn-sm btn-ghost btn-square"
+                                        :class="{ 'btn-active': mode === 'error' }"
+                                        @click="mode = 'error'; focusInput()"
+                                        aria-label="Error">
+                                    <x-heroicon-o-no-symbol class="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {{-- Message Input --}}
+                        <div class="bg-base-100 pt-2">
+                            <form @submit.prevent="sendMessage"
+                                  class="flex gap-2"
+                                  aria-label="Форма отправки сообщения">
+                                <input type="text"
+                                       x-model="message"
+                                       x-ref="input"
+                                       class="input input-bordered text-base flex-1 focus:outline-none focus:border-primary bg-base-100"
+                                       placeholder="Введите сообщение..."
+                                       :disabled="loading"
+                                       aria-label="Текст сообщения"
+                                       autofocus>
+                                <button type="submit"
+                                        class="btn btn-primary btn-square"
+                                        :disabled="loading || !message.trim()"
+                                        aria-label="Отправить сообщение">
+                                    <x-heroicon-o-arrow-up-circle class="w-6 h-6" />
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
